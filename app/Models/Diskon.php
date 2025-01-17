@@ -12,11 +12,6 @@ class Diskon extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
     protected $fillable = ['nama_diskon', 'persentase_diskon', 'tanggal_awal', 'tanggal_akhir', 'id_stan'];
-
-    public function menus()
-    {
-        return $this->belongsToMany(Menu::class, 'menu_diskon', 'id',  'id_diskon');
-    }
 }
 
 

@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Menu extends Model
+class MenuDiskon extends Model
 {
     use HasFactory;
-    protected $table = 'menu';
+    protected $table = 'menu_diskon';
     protected $primaryKey = 'id';
     public $timestamps = false;
-    protected $fillable = ['nama_makanan', 'harga', 'jenis', 'foto', 'deskripsi', 'id_stan'];
+    protected $fillable = ['id_menu', 'id_diskon'];
 }
-

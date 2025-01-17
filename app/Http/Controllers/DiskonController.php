@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class DiskonController extends Controller
 {
     public function get(){
-        $get = Diskon::with('menus')->get();
+        $get = Diskon::with('menu')->get();
         return response()->json($get);
     }
 
@@ -21,14 +21,12 @@ class DiskonController extends Controller
             'tanggal_awal' => 'required|date',
             'tanggal_akhir' => 'required|date',
             'id_stan' => 'required|integer',
-            'menu_ids' => 'required|array', 
-            'menu_ids.*' => 'exists:id',
         ]);
 
         if($validator->fails()){
             return response()->json([
                 'status' => false,
-                'message' => $validator->errors()->first() // Ganti error dengan errors
+                'message' => $validator->errors()->first()
             ], 400);
         }
 
@@ -39,7 +37,6 @@ class DiskonController extends Controller
         $diskon->tanggal_akhir = $req->tanggal_akhir; 
         $diskon->id_stan = $req->id_stan;
         $diskon->save();
-        $diskon->menus()->sync($req->menu_ids);
 
         return response()->json([
             'status' => true,
@@ -55,14 +52,12 @@ class DiskonController extends Controller
             'tanggal_awal' => 'required|date',
             'tanggal_akhir' => 'required|date',
             'id_stan' => 'required|integer',
-            'menu_ids' => 'required|array', // Tambahkan validasi untuk menu_ids
-            'menu_ids.*' => 'exists:id',
         ]);
 
         if($validator->fails()){
             return response()->json([
                 'status' => false,
-                'message' => $validator->errors()->first() // Ganti error dengan errors
+                'message' => $validator->errors()->first()
             ], 400);
         }
 
@@ -82,7 +77,6 @@ class DiskonController extends Controller
         $diskon->id_stan = $req->id_stan;
         $diskon->save();
 
-        $diskon->menus()->sync($req->menu_ids);
         
         return response()->json([
             'status' => true,
@@ -101,7 +95,7 @@ class DiskonController extends Controller
         }
 
         // Hapus relasi dengan menu
-        $diskon->menus()->detach();
+        $diskon->menu()->detach();
         $diskon->delete();
 
         return response()->json([
