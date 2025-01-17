@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\CRUD;
+use App\Models\Menu;
 use App\Models\SiswaModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +14,14 @@ class SiswaController extends Controller
     public function get(){
         $get = SiswaModel::get();
         return response()->json($get);
+    }
+    public function getMenu()
+    {
+        $menu = Menu::all();
+        return response()->json([
+            'status' => true,
+            'data' => $menu
+        ], 200);
     }
     public function create(Request $req){
         $validator = Validator::make($req->all(),[
