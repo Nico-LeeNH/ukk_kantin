@@ -18,7 +18,7 @@ class TransaksiController extends Controller
             'tanggal' => 'required|date',
             'id_stan' => 'required|integer',
             'id_siswa' => 'required|integer',
-            'status' => 'required|string|in:belum dikonfirm,dimasak,sampai',
+            'status' => 'required|string|in:belum dikonfirm,diantar,dimasak,sampai',
         ]);
         if($validator->fails()){
             return response()->json([
@@ -40,4 +40,48 @@ class TransaksiController extends Controller
             'message' => 'create sukses'
         ], 201);
 }
+public function updatetransaksi(Request $req, $id)
+{
+    // Validasi input
+    $validator = Validator::make($req->all(), [
+        'tanggal' => 'required|date',
+        'id_stan' => 'required|integer',
+        'id_siswa' => 'required|integer',
+        'status' => 'required|string|in:belum dikonfirm,diantar,dimasak,sampai',
+    ]);
+
+    // Jika validasi gagal
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'message' => $validator->errors()->first(),
+        ], 400);
+    }
+
+    // Mencari data transaksi berdasarkan ID
+    $transaksi = Transaksi::find($id);
+
+    // Jika data tidak ditemukan
+    if (!$transaksi) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Data not found',
+        ], 404);
+    }
+
+    // Memperbarui data transaksi
+    $transaksi->tanggal = $req->tanggal;
+    $transaksi->id_stan = $req->id_stan;
+    $transaksi->id_siswa = $req->id_siswa;
+    $transaksi->status = $req->status;
+    $transaksi->save();
+
+    // Mengembalikan respons sukses
+    return response()->json([
+        'status' => true,
+        'data' => $transaksi,
+        'message' => 'Data successfully updated',
+    ], 200);
+}
+
 }
