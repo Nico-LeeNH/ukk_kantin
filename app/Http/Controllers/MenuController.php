@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MenuController extends Controller
@@ -18,7 +19,7 @@ class MenuController extends Controller
             'nama_makanan' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'jenis' => 'required|string|in:makanan,minuman',
-            'foto' => 'required|string|max:255',
+            'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
             'deskripsi' => 'required|string|max:255',
         ]);
 
@@ -28,12 +29,12 @@ class MenuController extends Controller
                 'message' => $validator->error()->first()
             ], 400);
         }
-
+        $path = $req->file('foto')->store('public/fotos');
         $menu = new Menu();
         $menu->nama_makanan = $req->nama_makanan; 
         $menu->harga = $req->harga; 
         $menu->jenis = $req->jenis; 
-        $menu->foto = $req->foto; 
+        $menu->foto = $path; 
         $menu->deskripsi = $req->deskripsi; 
         $menu->id_stan = $req->id_stan;
         $menu->save();
@@ -50,7 +51,7 @@ class MenuController extends Controller
             'nama_makanan' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'jenis' => 'required|string|in:makanan,minuman',
-            'foto' => 'required|string|max:255',
+            'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
             'deskripsi' => 'required|string|max:255',
             'id_stan' => 'required|integer', // Tambahkan validasi untuk id_users
         ]);
@@ -74,7 +75,15 @@ class MenuController extends Controller
         $menu->nama_makanan = $req->nama_makanan;
         $menu->harga = $req->harga;
         $menu->jenis = $req->jenis;
-        $menu->foto = $req->foto;
+        if ($req->hasFile('foto')) {
+            // Hapus file foto lama jika ada
+            if ($menu->foto) {
+                Storage::delete($menu->foto);
+            }
+            // Simpan file foto baru
+            $path = $req->file('foto')->store('public/fotos');
+            $menu->foto = $path;
+        }
         $menu->deskripsi = $req->deskripsi;
         $menu->id_stan = $req->id_stan;
         $menu->save();
