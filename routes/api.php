@@ -3,11 +3,13 @@
 use App\Http\Controllers\AdminSController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CrudController;
+use App\Http\Controllers\DetailTransaksiController;
 use App\Http\Controllers\DiskonController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MenuDiskonController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Middleware\JwtMiddleware;
-use App\Models\Diskon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,7 @@ Route::get('/get', [SiswaController::class, 'get']);
 Route::post('/add', [SiswaController::class, 'create']);
 Route::put('/update/{id}', [SiswaController::class, 'update']);
 Route::delete('/delete/{id}', [SiswaController::class, 'delete']);
+Route::get('/getmenu', [SiswaController::class, 'getMenu']);
 
 Route::get('/getadmin', [AdminSController::class, 'getadmin']);
 Route::post('/addadmin', [AdminSController::class, 'createadmin']);
@@ -41,3 +44,11 @@ Route::get('/diskon', [DiskonController::class, 'get']);
 Route::post('/diskon', [DiskonController::class, 'creatediskon']);
 Route::put('/diskon/{id}', [DiskonController::class, 'updatediskon']);
 Route::delete('/diskon/{id}', [DiskonController::class, 'deletediskon']);
+
+Route::post('/diskonmenu', [MenuDiskonController::class, 'creatediskonmenu']);
+
+Route::get('/gettransaksi', [TransaksiController::class, 'gettransaksi']);
+Route::post('/addtransaksi', [TransaksiController::class, 'transaksi']);
+
+Route::get('/getdetailtransaksi', [DetailTransaksiController::class, 'getdetailtransaksi']);
+Route::post('/detailtransaksi', [DetailTransaksiController::class, 'detailtransaksi']);
