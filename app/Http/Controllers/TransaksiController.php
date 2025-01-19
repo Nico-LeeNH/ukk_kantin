@@ -40,7 +40,38 @@ class TransaksiController extends Controller
             'message' => 'create sukses'
         ], 201);
 }
-public function updatetransaksi(Request $req, $id)
+public function updateStatus(Request $req, $id){
+    $validator = Validator::make($req->all(),[
+        'status' => 'required|string|in:belum dikonfirm,diantar,dimasak,sampai',
+    ]);
+
+    if($validator->fails()){
+        return response()->json([
+            'status' => false,
+            'message' => $validator->errors()->first()
+        ], 400);
+    }
+
+    $transaksi = Transaksi::find($id);
+
+    if (!$transaksi) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Transaksi not found'
+        ], 404);
+    }
+
+    $transaksi->status = $req->status;
+    $transaksi->save();
+
+    return response()->json([
+        'status' => true,
+        'data' => $transaksi,
+        'message' => 'Status successfully updated'
+    ], 200);
+}    
+
+    public function updatetransaksi(Request $req, $id)
 {
     // Validasi input
     $validator = Validator::make($req->all(), [
@@ -81,6 +112,28 @@ public function updatetransaksi(Request $req, $id)
         'status' => true,
         'data' => $transaksi,
         'message' => 'Data successfully updated',
+    ], 200);
+}
+public function getTransaksiByMonth($month, $year){
+    $validator = Validator::make(['month' => $month, 'year' => $year],[
+        'month' => 'required|integer|min:1|max:12',
+        'year' => 'required|integer|min:2000|max:'.date('Y'),
+    ]);
+
+    if($validator->fails()){
+        return response()->json([
+            'status' => false,
+            'message' => $validator->errors()->first()
+        ], 400);
+    }
+
+    $transaksi = Transaksi::whereMonth('tanggal', $month)
+                          ->whereYear('tanggal', $year)
+                          ->get();
+
+    return response()->json([
+        'status' => true,
+        'data' => $transaksi
     ], 200);
 }
 
