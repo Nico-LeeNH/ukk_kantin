@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CRUD;
 use App\Models\Menu;
 use App\Models\SiswaModel;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -15,12 +16,37 @@ class SiswaController extends Controller
         $get = SiswaModel::get();
         return response()->json($get);
     }
+    public function getstatuspesan(){
+        $get = Transaksi::get();
+        return response()->json($get);
+    }
     public function getMenu()
     {
         $menu = Menu::all();
         return response()->json([
             'status' => true,
             'data' => $menu
+        ], 200);
+    }
+    public function getTransaksiByMonth($id_siswa, $month){
+        $validator = Validator::make(['month' => $month],[
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ], 400);
+        }
+
+        $transaksi = Transaksi::where('id_siswa', $id_siswa)
+                              ->whereMonth('tanggal', $month)
+                              ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $transaksi
         ], 200);
     }
     public function create(Request $req){
