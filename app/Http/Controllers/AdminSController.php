@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\AdminS;
 use App\Models\CRUD;
-use App\Models\SiswaModel;
+use App\Models\DetailTransaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,6 +14,28 @@ class AdminSController extends Controller
     public function getadmin(){
         $get = AdminS::get();
         return response()->json($get);
+    }
+    public function getRekapPemasukanByMonth($month, $year){
+        $validator = Validator::make(['month' => $month, 'year' => $year],[
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:'.date('Y'),
+        ]);
+    
+        if($validator->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ], 400);
+        }
+    
+        $totalPemasukan = DetailTransaksi::whereMonth('created_at', $month)
+                                         ->whereYear('created_at', $year)
+                                         ->sum('harga_beli');
+    
+        return response()->json([
+            'status' => true,
+            'total_pemasukan' => $totalPemasukan
+        ], 200);
     }
     public function createadmin(Request $req){
         $validator = Validator::make($req->all(),[
@@ -29,16 +51,16 @@ class AdminSController extends Controller
             ], 400);
         }
 
-        $siswa = new AdminS();
-        $siswa->nama_stan = $req->nama_stan; 
-        $siswa->nama_pemilik = $req->nama_pemilik; 
-        $siswa->telp = $req->telp; 
-        $siswa->id_users = $req->id_users;
-        $siswa->save();
+        $stan = new AdminS();
+        $stan->nama_stan = $req->nama_stan; 
+        $stan->nama_pemilik = $req->nama_pemilik; 
+        $stan->telp = $req->telp; 
+        $stan->id_users = $req->id_users;
+        $stan->save();
 
         return response()->json([
             'status'=>true,
-            'data' => $siswa,
+            'data' => $stan,
             'message'=>'create sukses'
         ]);
     }
@@ -48,7 +70,6 @@ class AdminSController extends Controller
             'nama_stan' => 'required|string|max:255',
             'nama_pemilik' => 'required|string|max:255',
             'telp' => 'required|string|max:20',
-            'id_users' => 'required|integer', // Tambahkan validasi untuk id_users
         ]);
 
         if($validator->fails()){
@@ -58,25 +79,25 @@ class AdminSController extends Controller
             ], 400);
         }
 
-        $siswa = AdminS::find($id);
+        $stan = AdminS::find($id);
 
-        if (!$siswa) {
+        if (!$stan) {
             return response()->json([
                 'status' => false,
                 'message' => 'Data not found'
             ], 404);
         }
 
-        $siswa->nama_stan = $req->nama_stan;
-        $siswa->nama_pemilik = $req->nama_pemilik;
-        $siswa->telp = $req->telp;
-        $siswa->id_users = $req->id_users; // Tambahkan id_users
-        $siswa->save();
+        $stan->nama_stan = $req->nama_stan;
+        $stan->nama_pemilik = $req->nama_pemilik;
+        $stan->telp = $req->telp;
+        $stan->id_users = $req->id_users; // Tambahkan id_users
+        $stan->save();
 
         return response()->json([
             'status' => true,
             'message' => 'Data successfully updated',
-            'data' => $siswa
+            'data' => $stan
         ], 200);
     }
            
@@ -94,7 +115,7 @@ class AdminSController extends Controller
         return response()->json([
             'status'=>true,
             'data'=>$delete, // Mengembalikan data yang dihapus
-            'message'=>'Siswa has deleted'
+            'message'=>'stan has deleted'
         ]);
     }
 }

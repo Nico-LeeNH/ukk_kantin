@@ -7,8 +7,10 @@ use App\Models\CRUD;
 use App\Models\Menu;
 use App\Models\SiswaModel;
 use App\Models\Transaksi;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SiswaController extends Controller
 {
@@ -54,7 +56,7 @@ class SiswaController extends Controller
             'nama_siswa' => 'required|string|max:255',
             'alamat' => 'required|string',
             'telp' => 'required|string|max:20',
-            'foto' => 'required|string|max:255',
+            'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if($validator->fails()){
@@ -68,9 +70,11 @@ class SiswaController extends Controller
         $siswa->nama_siswa = $req->nama_siswa; 
         $siswa->alamat = $req->alamat; 
         $siswa->telp = $req->telp; 
-        $siswa->foto = $req->foto; 
+        $siswa->foto = $req->foto->store('public/fotos'); 
         $siswa->id_users = $req->id_users;
         $siswa->save();
+        $user = User::find($siswa->id_users);
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'status'=>true,
@@ -84,8 +88,7 @@ class SiswaController extends Controller
             'nama_siswa' => 'required|string|max:255',
             'alamat' => 'required|string',
             'telp' => 'required|string|max:20',
-            'foto' => 'required|string|max:255',
-            'id_users' => 'required|integer', // Tambahkan validasi untuk id_users
+            'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if($validator->fails()){
@@ -107,8 +110,10 @@ class SiswaController extends Controller
         $siswa->nama_siswa = $req->nama_siswa;
         $siswa->alamat = $req->alamat;
         $siswa->telp = $req->telp;
-        $siswa->foto = $req->foto;
-        $siswa->id_users = $req->id_users; // Tambahkan id_users
+        if ($req->has('foto')) {
+            $siswa->foto = $req->foto->store('public/fotos');
+        }
+        $siswa->id_users = $req->id_users; 
         $siswa->save();
 
         return response()->json([
@@ -131,8 +136,29 @@ class SiswaController extends Controller
         $delete->delete();
         return response()->json([
             'status'=>true,
-            'data'=>$delete, // Mengembalikan data yang dihapus
+            'data'=>$delete, 
             'message'=>'Siswa has deleted'
         ]);
     }
+    public function cetakNotas($id_transaksi){
+        $transaksi = Transaksi::with('details.menu')->find($id_transaksi);
+    
+        if (!$transaksi) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Transaksi not found'
+            ], 404);
+        }
+    
+        $nota = [
+            'transaksi' => $transaksi,
+            'details' => $transaksi->details
+        ];
+    
+        return response()->json([
+            'status' => true,
+            'data' => $nota
+        ], 200);
+    }
+    
 }
