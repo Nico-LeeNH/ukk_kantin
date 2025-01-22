@@ -24,7 +24,13 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-
+        $existingUser = User::where('username', $request->username)->first();
+        if ($existingUser && Hash::check($request->password, $existingUser->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Username and password already exist'
+            ], 400);
+        }
         $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
