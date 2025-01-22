@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Validator;
 
 class MenuDiskonController extends Controller
 {
+    public function getmenudiskon(){
+        $get = MenuDiskon::get();
+        return response()->json($get);
+    }
     public function creatediskonmenu(Request $req){
         $validator = Validator::make($req->all(),[
             'id_menu' => 'required|integer',
