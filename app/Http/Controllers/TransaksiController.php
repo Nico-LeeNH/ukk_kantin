@@ -17,7 +17,6 @@ class TransaksiController extends Controller
         $validator = Validator::make($req->all(),[
             'tanggal' => 'required|date',
             'id_stan' => 'required|integer',
-            'id_siswa' => 'required|integer',
             'status' => 'required|string|in:belum dikonfirm,diantar,dimasak,sampai',
         ]);
         if($validator->fails()){
@@ -77,7 +76,6 @@ public function updateStatus(Request $req, $id){
     $validator = Validator::make($req->all(), [
         'tanggal' => 'required|date',
         'id_stan' => 'required|integer',
-        'id_siswa' => 'required|integer',
         'status' => 'required|string|in:belum dikonfirm,diantar,dimasak,sampai',
     ]);
 

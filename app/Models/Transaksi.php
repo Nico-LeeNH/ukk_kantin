@@ -12,4 +12,8 @@ class Transaksi extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
     protected $fillable = ['tanggal', 'id_stan', 'id_siswa', 'status'];
+    public function details()
+    {
+        return $this->hasMany(DetailTransaksi::class, 'id_transaksi');
+    }
 }
