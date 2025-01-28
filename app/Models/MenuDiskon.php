@@ -12,4 +12,8 @@ class MenuDiskon extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
     protected $fillable = ['id_menu', 'id_diskon'];
+    public function diskon()
+    {
+        return $this->belongsTo(Diskon::class, 'id_diskon');
+    }
 }
