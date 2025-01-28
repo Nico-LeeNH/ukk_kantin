@@ -25,6 +25,14 @@ class MenuDiskonController extends Controller
             ], 400);
         }
 
+        $existingMenu = MenuDiskon::where('id_menu', $req->id_menu)->first();
+        if ($existingMenu) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Menu sudah memiliki diskon lain'
+            ], 400);
+        }
+
         $diskonmenu = new MenuDiskon();
         $diskonmenu->id_menu = $req->id_menu;
         $diskonmenu->id_diskon = $req->id_diskon;
@@ -36,4 +44,35 @@ class MenuDiskonController extends Controller
             'message' => 'create sukses'
         ], 201);
 }
+    public function updatediskonmenu(Request $req, $id){
+        $validator = Validator::make($req->all(),[
+            'id_menu' => 'required|integer',
+            'id_diskon' => 'required|integer',
+        ]);
+        if($validator->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ], 400);
+        }
+        $diskon = MenuDiskon::find($id);
+        if (!$diskon) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Diskon not found'
+            ], 404);
+        }
+    
+        $diskon->id_menu = $req->id_menu;
+        $diskon->id_diskon = $req->id_diskon;
+        $diskon->save();
+
+        return response()->json([
+            'status' => true,
+            'data' => $diskon,
+            'message' => 'update sukses'
+        ], 201);
+}
+
+
 }
