@@ -55,6 +55,7 @@ Route::delete('/diskon/{id}', [DiskonController::class, 'deletediskon']);
 
 Route::post('/diskonmenu', [MenuDiskonController::class, 'creatediskonmenu']);
 Route::get('/getmenudiskon', [MenuDiskonController::class, 'getmenudiskon']);
+Route::put('/updatemenudiskon/{id}', [MenuDiskonController::class, 'updatediskonmenu']);
 
 Route::middleware(['auth:api', \App\Http\Middleware\AddSiswaId::class,])->group(function () {
     Route::post('/transaksi', [TransaksiController::class, 'transaksi']);
@@ -64,6 +65,8 @@ Route::get('/transaksi/{month}/{year}', [TransaksiController::class, 'getTransak
 Route::put('/updatetransaksi/{id}', [TransaksiController::class, 'updatetransaksi']);
 Route::put('/updatestatus/{id}', [TransaksiController::class, 'updateStatus']);
 
+Route::middleware(['auth:api', \App\Http\Middleware\CheckRoleSiswa::class,])->group(function () {
+    Route::post('/detailtransaksi', [DetailTransaksiController::class, 'detailtransaksi']);
+});
 Route::get('/getdetailtransaksi', [DetailTransaksiController::class, 'getdetailtransaksi']);
 Route::get('/rekappemasukan/{month}/{year}', [DetailTransaksiController::class, 'getRekapPemasukanByMonth']);
-Route::post('/detailtransaksi', [DetailTransaksiController::class, 'detailtransaksi']);
