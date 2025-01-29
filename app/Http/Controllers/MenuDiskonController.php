@@ -73,6 +73,21 @@ class MenuDiskonController extends Controller
             'message' => 'update sukses'
         ], 201);
 }
+public function deletemenudiskon($id){
+    $diskon = MenuDiskon::find($id);
+
+    if (!$diskon) {
+        return response()->json([
+            'status' => false,
+            'message' => 'MenuDiskon not found'
+        ], 404);
+    }
+    $diskon->delete();
+    return response()->json([
+        'status' => true,
+        'message' => 'delete sukses'
+    ], 200);
+}
 
 
 }
