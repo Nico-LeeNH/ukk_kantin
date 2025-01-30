@@ -15,7 +15,7 @@ class AdminSController extends Controller
         $get = AdminS::get();
         return response()->json($get);
     }
-    public function getRekapPemasukanByMonth($month, $year){
+    public function getRekapPemesananByMonth($month, $year){
         $validator = Validator::make(['month' => $month, 'year' => $year],[
             'month' => 'required|integer|min:1|max:12',
             'year' => 'required|integer|min:2000|max:'.date('Y'),
@@ -27,14 +27,19 @@ class AdminSController extends Controller
                 'message' => $validator->errors()->first()
             ], 400);
         }
+
+        $rekapPemesanan = DetailTransaksi::join('transaksi', 'detail_transaksi.id_transaksi', '=', 'transaksi.id')
+                                         ->whereMonth('transaksi.tanggal', $month)
+                                         ->whereYear('transaksi.tanggal', $year)
+                                         ->select('transaksi.id', 'transaksi.tanggal', 'detail_transaksi.id_menu', 'detail_transaksi.qty', 'detail_transaksi.harga_beli')
+                                         ->get();
     
-        $totalPemasukan = DetailTransaksi::whereMonth('created_at', $month)
-                                         ->whereYear('created_at', $year)
-                                         ->sum('harga_beli');
+        $totalPemasukan = $rekapPemesanan->sum('harga_beli');
     
         return response()->json([
             'status' => true,
-            'total_pemasukan' => $totalPemasukan
+            'total_pemasukan' => $totalPemasukan,
+            'rekap_pemesanan' => $rekapPemesanan
         ], 200);
     }
     public function createadmin(Request $req){
