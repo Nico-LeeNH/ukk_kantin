@@ -33,12 +33,15 @@ Route::middleware(['auth:api', \App\Http\Middleware\AddUserIdFromRole::class,])-
 Route::get('/get', [SiswaController::class, 'get']);
 Route::delete('/delete/{id}', [SiswaController::class, 'delete']);
 Route::get('/getmenu', [SiswaController::class, 'getMenu']);
-Route::get('/getstatuspesan/{id}', [SiswaController::class, 'getstatuspesan']);
-Route::get('/gethistorytransaksi/{id_siswa}/{month}', [SiswaController::class, 'getTransaksiByMonth']);
+Route::get('/statuspesan/{id_transaksi}', [SiswaController::class, 'getstatuspesan']);
+Route::get('/gethistorytransaksi/{id_siswa}/{month}/{year}', [SiswaController::class, 'getTransaksiByMonth']);
 Route::get('/cetak-nota/{id_transaksi}', [DetailTransaksiController::class, 'cetakNota']);
 
 Route::middleware(['auth:api', \App\Http\Middleware\CheckRoleSiswa::class,])->group(function () {
     Route::get('/cetak-notas/{id_transaksi}', [SiswaController::class, 'cetakNotas']);
+});
+Route::middleware(['auth:api', \App\Http\Middleware\CheckRoleAdmin::class,])->group(function () {
+    Route::get('/pemesanan/{month}/{year}', [AdminSController::class, 'getRekapPemesananByMonth']);
 });
 
 Route::get('/getadmin', [AdminSController::class, 'getadmin']);
