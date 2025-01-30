@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailTransaksi;
 use App\Models\Menu;
 use App\Models\MenuDiskon;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,7 +21,6 @@ class DetailTransaksiController extends Controller
             'id_transaksi' => 'required|integer',
             'id_menu' => 'required|integer',
             'qty' => 'required|integer',
-            'harga_beli' => 'required|numeric',
         ]);
         if($validator->fails()){
             return response()->json([
@@ -36,12 +36,31 @@ class DetailTransaksiController extends Controller
             ], 404);
         }
 
+        $transaksi = Transaksi::find($req->id_transaksi);
+        if (!$transaksi) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Transaksi not found'
+            ], 404);
+        }
+
         $menuDiskon = MenuDiskon::where('id_menu', $req->id_menu)->with('diskon')->first();
-        $diskonPersentase = $menuDiskon ? $menuDiskon->diskon->persentase_diskon : 0;
+        $diskonPersentase = 0;
+        if ($menuDiskon) {
+            $diskon = $menuDiskon->diskon;
+            $tanggal_transaksi = $transaksi->tanggal;
+            if ($tanggal_transaksi >= $diskon->tanggal_awal && $tanggal_transaksi <= $diskon->tanggal_akhir) {
+                $diskonPersentase = $diskon->persentase_diskon;
+            }
+        }
 
         $total_harga = $menu->harga * $req->qty;
         $total_diskon = ($diskonPersentase / 100) * $total_harga;
         $harga_setelah_diskon = $total_harga - $total_diskon;
+
+        if ($diskonPersentase == 0) {
+            $harga_setelah_diskon = $total_harga;
+        }
 
         $transaksi = new DetailTransaksi();
         $transaksi->id_transaksi = $req->id_transaksi;
