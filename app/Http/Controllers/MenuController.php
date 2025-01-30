@@ -16,7 +16,7 @@ class MenuController extends Controller
     }
     public function createmenu(Request $req){
         $validator = Validator::make($req->all(),[
-            'nama_makanan' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'jenis' => 'required|string|in:makanan,minuman',
             'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
@@ -26,15 +26,15 @@ class MenuController extends Controller
         if($validator->fails()){
             return response()->json([
                 'status' => false,
-                'message' => $validator->error()->first()
+                'message' => $validator->errors()->first()
             ], 400);
         }
-        $path = $req->file('foto')->store('public/fotos');
+        $path = $req->file('foto')->store('fotos','public');
         $menu = new Menu();
-        $menu->nama_makanan = $req->nama_makanan; 
+        $menu->nama_makanan = $req->nama; 
         $menu->harga = $req->harga; 
         $menu->jenis = $req->jenis; 
-        $menu->foto = $path; 
+        $menu->foto = 'storage/' .$path; 
         $menu->deskripsi = $req->deskripsi; 
         $menu->id_stan = $req->id_stan;
         $menu->save();
@@ -48,7 +48,7 @@ class MenuController extends Controller
 
     public function updatemenu(Request $req, $id){
         $validator = Validator::make($req->all(),[
-            'nama_makanan' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'jenis' => 'required|string|in:makanan,minuman',
             'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
@@ -72,17 +72,15 @@ class MenuController extends Controller
             ], 404);
         }
 
-        $menu->nama_makanan = $req->nama_makanan;
+        $menu->nama_makanan = $req->nama;
         $menu->harga = $req->harga;
         $menu->jenis = $req->jenis;
         if ($req->hasFile('foto')) {
-            // Hapus file foto lama jika ada
             if ($menu->foto) {
-                Storage::delete($menu->foto);
+                Storage::delete('public/' . str_replace('storage/', '', $menu->foto));
             }
-            // Simpan file foto baru
-            $path = $req->file('foto')->store('public/fotos');
-            $menu->foto = $path;
+            $path = $req->file('foto')->store('fotos', 'public');
+            $menu->foto = 'storage/' . $path;
         }
         $menu->deskripsi = $req->deskripsi;
         $menu->id_stan = $req->id_stan;
