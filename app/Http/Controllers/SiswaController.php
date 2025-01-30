@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\CRUD;
 use App\Models\Menu;
+use App\Models\siswa;
 use App\Models\SiswaModel;
 use App\Models\Transaksi;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -18,9 +20,18 @@ class SiswaController extends Controller
         $get = SiswaModel::get();
         return response()->json($get);
     }
-    public function getstatuspesan(){
-        $get = Transaksi::get();
-        return response()->json($get);
+    public function getstatuspesan($id_transaksi){
+        $transaksi = Transaksi::find($id_transaksi);
+        if (!$transaksi) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Transaksi not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $transaksi
+        ], 200);
     }
     public function getMenu()
     {
@@ -30,9 +41,11 @@ class SiswaController extends Controller
             'data' => $menu
         ], 200);
     }
-    public function getTransaksiByMonth($id_siswa, $month){
-        $validator = Validator::make(['month' => $month],[
+    public function getTransaksiByMonth($id_siswa, $month, $year){
+        $validator = Validator::make(['month' => $month
+            , 'year' => $year],[
             'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:'. date('Y'),
         ]);
 
         if($validator->fails()){
@@ -65,12 +78,12 @@ class SiswaController extends Controller
                 'message' => $validator->error()->first()
             ], 400);
         }
-
+        $path = $req->file('foto')->store('siswa','public');
         $siswa = new SiswaModel();
         $siswa->nama_siswa = $req->nama_siswa; 
         $siswa->alamat = $req->alamat; 
         $siswa->telp = $req->telp; 
-        $siswa->foto = $req->foto->store('public/fotos'); 
+        $siswa->foto = 'storage/' .$path; 
         $siswa->id_users = $req->id_users;
         $siswa->save();
         $user = User::find($siswa->id_users);
@@ -110,8 +123,12 @@ class SiswaController extends Controller
         $siswa->nama_siswa = $req->nama_siswa;
         $siswa->alamat = $req->alamat;
         $siswa->telp = $req->telp;
-        if ($req->has('foto')) {
-            $siswa->foto = $req->foto->store('public/fotos');
+        if ($req->hasFile('foto')) {
+            if ($siswa->foto) {
+                Storage::delete('public/' . str_replace('storage/', '', $siswa->foto));
+            }
+            $path = $req->file('foto')->store('siswa', 'public');
+            $siswa->foto = 'storage/' . $path;
         }
         $siswa->id_users = $req->id_users; 
         $siswa->save();
@@ -141,7 +158,7 @@ class SiswaController extends Controller
         ]);
     }
     public function cetakNotas($id_transaksi){
-        $transaksi = Transaksi::with('details.menu')->find($id_transaksi);
+        $transaksi = Transaksi::with('details.siswa')->find($id_transaksi);
     
         if (!$transaksi) {
             return response()->json([
@@ -152,7 +169,6 @@ class SiswaController extends Controller
     
         $nota = [
             'transaksi' => $transaksi,
-            'details' => $transaksi->details
         ];
     
         return response()->json([
