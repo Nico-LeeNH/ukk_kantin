@@ -18,7 +18,7 @@ class CheckRoleAdmin
     {
         $user = Auth::user();
 
-        if ($user && $user->role === 'admin_stan') { // Pastikan pengguna memiliki peran siswa
+        if ($user && $user->role === 'admin_stan') { // Pastikan pengguna memiliki peran admin
             return $next($request);
         }
 

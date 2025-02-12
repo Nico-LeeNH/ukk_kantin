@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,7 +17,7 @@ class MenuController extends Controller
     }
     public function createmenu(Request $req){
         $validator = Validator::make($req->all(),[
-            'nama' => 'required|string|max:255',
+            'nama_makanan' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'jenis' => 'required|string|in:makanan,minuman',
             'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
@@ -29,32 +30,33 @@ class MenuController extends Controller
                 'message' => $validator->errors()->first()
             ], 400);
         }
+
         $path = $req->file('foto')->store('fotos','public');
         $menu = new Menu();
-        $menu->nama_makanan = $req->nama; 
-        $menu->harga = $req->harga; 
-        $menu->jenis = $req->jenis; 
-        $menu->foto = 'storage/' .$path; 
-        $menu->deskripsi = $req->deskripsi; 
+        $menu->nama_makanan = $req->nama_makanan;
+        $menu->harga = $req->harga;
+        $menu->jenis = $req->jenis;
+        $menu->foto = 'storage/' . $path;
+        $menu->deskripsi = $req->deskripsi;
         $menu->id_stan = $req->id_stan;
         $menu->save();
 
         return response()->json([
-            'status'=>true,
+            'status' => true,
             'data' => $menu,
-            'message'=>'create sukses'
+            'message' => 'create sukses'
         ]);
     }
 
     public function updatemenu(Request $req, $id){
-        $validator = Validator::make($req->all(),[
-            'nama' => 'required|string|max:255',
+        $validator = Validator::make($req->all(), [
+            'nama_makanan' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'jenis' => 'required|string|in:makanan,minuman',
-            'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
+            'foto' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
             'deskripsi' => 'required|string|max:255',
-            'id_stan' => 'required|integer', // Tambahkan validasi untuk id_users
         ]);
+        
 
         if($validator->fails()){
             return response()->json([
@@ -72,12 +74,12 @@ class MenuController extends Controller
             ], 404);
         }
 
-        $menu->nama_makanan = $req->nama;
+        $menu->nama_makanan = $req->nama_makanan;
         $menu->harga = $req->harga;
         $menu->jenis = $req->jenis;
         if ($req->hasFile('foto')) {
             if ($menu->foto) {
-                Storage::delete('public/' . str_replace('storage/', '', $menu->foto));
+                Storage::disk('public')->delete(str_replace('storage/', '', $menu->foto));
             }
             $path = $req->file('foto')->store('fotos', 'public');
             $menu->foto = 'storage/' . $path;
@@ -95,19 +97,24 @@ class MenuController extends Controller
            
 
     public function deletemenu($id){
-        $delete = menu::find($id);
+        $menu = Menu::find($id);
 
-        if(!$delete){
+        if (!$menu) {
             return response()->json([
-                'message'=>'error'
-            ]);
+                'status' => false,
+                'message' => 'Menu not found'
+            ], 404);
         }
 
-        $delete->delete();
+        if ($menu->foto) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $menu->foto));
+        }
+        $menu->delete();
+
         return response()->json([
-            'status'=>true,
-            'data'=>$delete, // Mengembalikan data yang dihapus
-            'message'=>'menu has deleted'
-        ]);
+            'status' => true,
+            'data' => $menu,
+            'message' => 'Menu has been deleted'
+        ], 200);
     }
 }

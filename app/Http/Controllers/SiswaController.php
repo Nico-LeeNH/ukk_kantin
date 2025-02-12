@@ -103,7 +103,7 @@ class SiswaController extends Controller
             'telp' => 'required|string|max:20',
             'foto' => 'required|file|mimes:jpeg,png,jpg|max:2048',
         ]);
-
+        
         if($validator->fails()){
             return response()->json([
                 'status' => false,
@@ -125,7 +125,7 @@ class SiswaController extends Controller
         $siswa->telp = $req->telp;
         if ($req->hasFile('foto')) {
             if ($siswa->foto) {
-                Storage::delete('public/' . str_replace('storage/', '', $siswa->foto));
+                Storage::disk('public')->delete(str_replace('storage/', '', $siswa->foto));
             }
             $path = $req->file('foto')->store('siswa', 'public');
             $siswa->foto = 'storage/' . $path;
@@ -142,18 +142,20 @@ class SiswaController extends Controller
            
 
     public function delete($id){
-        $delete = SiswaModel::find($id);
+        $siswa = SiswaModel::find($id);
 
-        if(!$delete){
+        if(!$siswa){
             return response()->json([
                 'message'=>'error'
             ]);
         }
-
-        $delete->delete();
+        if ($siswa->foto) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $siswa->foto));
+        }
+        $siswa->delete();
         return response()->json([
             'status'=>true,
-            'data'=>$delete, 
+            'data'=>$siswa, 
             'message'=>'Siswa has deleted'
         ]);
     }

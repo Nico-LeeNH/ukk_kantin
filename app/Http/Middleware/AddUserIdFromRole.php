@@ -18,8 +18,18 @@ class AddUserIdFromRole
     {
         $user = Auth::user();
 
-        if ($user && $user->role === 'siswa' || $user->role === 'admin_stan' ) { 
+        if ($user) {
+            
             $request->merge(['id_users' => $user->id]);
+
+            $routeName = $request->route()->getName();
+            if (($routeName === 'create.admin_stan' && $user->role !== 'admin_stan') ||
+                ($routeName === 'create.siswa' && $user->role !== 'siswa')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized'
+                ], 403);
+            }
         } else {
             return response()->json([
                 'status' => false,
