@@ -26,7 +26,7 @@ Route::middleware(['auth:api'])->group(function () {
 });
 Route::middleware(['auth:api', \App\Http\Middleware\AddUserIdFromRole::class,])->group(function () {
     Route::post('/siswa', [SiswaController::class, 'create'])->name('create.siswa');
-    Route::put('/siswa/{id}', [SiswaController::class, 'update']);
+    Route::post('/siswa/{id}', [SiswaController::class, 'update']);
     Route::post('/admin', [AdminSController::class, 'createadmin'])->name('create.admin_stan');
     Route::put('/updateadmin/{id}', [AdminSController::class, 'updateadmin']);
 });
@@ -42,15 +42,14 @@ Route::middleware(['auth:api', \App\Http\Middleware\CheckRoleSiswa::class,])->gr
 });
 Route::middleware(['auth:api', \App\Http\Middleware\CheckRoleAdmin::class,])->group(function () {
     Route::get('/pemesanan/{month}/{year}', [AdminSController::class, 'getRekapPemesananByMonth']);
+    Route::get('/getmenu', [MenuController::class, 'getmenu']);
+    Route::post('/menu', [MenuController::class, 'createmenu']);
+    Route::delete('/deletemenu/{id}', [MenuController::class, 'deletemenu']);
 });
 
+Route::post('/menu/{id}', [MenuController::class, 'updatemenu']);
 Route::get('/getadmin', [AdminSController::class, 'getadmin']);
 Route::delete('/deleteadmin/{id}', [AdminSController::class, 'deleteadmin']);
-
-Route::get('/getmenu', [MenuController::class, 'getmenu']);
-Route::post('/menu', [MenuController::class, 'createmenu']);
-Route::put('/updatemenu/{id}', [MenuController::class, 'updatemenu']);
-Route::delete('/deletemenu/{id}', [MenuController::class, 'deletemenu']);
 
 Route::get('/diskon', [DiskonController::class, 'get']);
 Route::post('/diskon', [DiskonController::class, 'creatediskon']);
