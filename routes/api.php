@@ -35,7 +35,6 @@ Route::delete('/delete/{id}', [SiswaController::class, 'delete']);
 Route::get('/getmenu', [SiswaController::class, 'getMenu']);
 Route::get('/statuspesan/{id_transaksi}', [SiswaController::class, 'getstatuspesan']);
 Route::get('/gethistorytransaksi/{id_siswa}/{month}/{year}', [SiswaController::class, 'getTransaksiByMonth']);
-Route::get('/cetak-nota/{id_transaksi}', [DetailTransaksiController::class, 'cetakNota']);
 
 Route::middleware(['auth:api', \App\Http\Middleware\CheckRoleSiswa::class,])->group(function () {
     Route::get('/cetak-notas/{id_transaksi}', [SiswaController::class, 'cetakNotas']);
@@ -73,4 +72,3 @@ Route::middleware(['auth:api', \App\Http\Middleware\CheckRoleSiswa::class,])->gr
     Route::post('/detailtransaksi', [DetailTransaksiController::class, 'detailtransaksi']);
 });
 Route::get('/getdetailtransaksi', [DetailTransaksiController::class, 'getdetailtransaksi']);
-Route::get('/rekappemasukan/{month}/{year}', [DetailTransaksiController::class, 'getRekapPemasukanByMonth']);

@@ -112,7 +112,7 @@ class MenuController extends Controller
         $menu->delete();
 
         return response()->json([
-            'status' => true,
+            'status' => true, 
             'data' => $menu,
             'message' => 'Menu has been deleted'
         ], 200);

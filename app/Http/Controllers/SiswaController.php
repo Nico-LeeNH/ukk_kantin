@@ -160,8 +160,8 @@ class SiswaController extends Controller
         ]);
     }
     public function cetakNotas($id_transaksi){
-        $transaksi = Transaksi::with('details.siswa')->find($id_transaksi);
-    
+        // $transaksi = Transaksi::with('details.siswa')->find($id_transaksi);
+        $transaksi = Transaksi::with(['details.menu', 'siswa'])->find($id_transaksi);
         if (!$transaksi) {
             return response()->json([
                 'status' => false,
