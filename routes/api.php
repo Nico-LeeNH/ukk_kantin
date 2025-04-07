@@ -32,7 +32,7 @@ Route::middleware(['auth:api', \App\Http\Middleware\AddUserIdFromRole::class,])-
 });
 Route::get('/get', [SiswaController::class, 'get']);
 Route::delete('/delete/{id}', [SiswaController::class, 'delete']);
-Route::get('/getmenu', [SiswaController::class, 'getMenu']);
+Route::get('/getmenusiswa', [SiswaController::class, 'getMenu']);
 Route::get('/statuspesan/{id_transaksi}', [SiswaController::class, 'getstatuspesan']);
 Route::get('/gethistorytransaksi/{id_siswa}/{month}/{year}', [SiswaController::class, 'getTransaksiByMonth']);
 
