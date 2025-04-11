@@ -14,17 +14,6 @@
         .center {
             text-align: center;
         }
-        .logo {
-            font-size: 30px;
-            font-weight: bold;
-            border: 2px solid #000;
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            line-height: 50px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
         .divider {
             border-top: 1px dashed #000;
             margin: 10px 0;
@@ -50,9 +39,8 @@
 <body>
 
     <div class="center">
-        <div class="logo">N</div>
         <h3 style="margin: 0;">Kantin Sekolah</h3>
-        <p class="small">Jl. Danau Ranau, Sawojajar</p>
+        <p class="small">Malang, Sawojajar</p>
     </div>
 
     <div class="divider"></div>
@@ -67,24 +55,13 @@
             <td class="right small">{{ $transaksi->Admin->nama_stan }}</td>
         </tr>
         <tr>
-            <td class="small">Trx ID</td>
-            <td class="right small">TLK{{ str_pad($transaksi->id, 6, '0', STR_PAD_LEFT) }}</td>
+            <td class="small">ID</td>
+            <td class="right small">ID {{ str_pad($transaksi->id, 3, '0', STR_PAD_LEFT) }}</td>
         </tr>
         <tr>
             <td class="small">Customer</td>
             <td class="right small">{{ $transaksi->siswa->nama_siswa }}</td>
         </tr>
-    </table>
-
-    <div class="divider"></div>
-
-    <table class="table-item">
-        @foreach ($transaksi->details as $detail)
-        <tr>
-            <td>{{ $detail->menu->nama_makanan }} x{{ $detail->qty }}</td>
-            <td class="right">Rp{{ number_format($detail->harga_beli, 0, ',', '.') }}K</td>
-        </tr>
-        @endforeach
     </table>
 
     <div class="divider"></div>
@@ -101,19 +78,30 @@
 
     $totalDiskon = $subtotal - $total;
     @endphp
+    
+    <table class="table-item">
+        @foreach ($transaksi->details as $detail)
+        <tr>
+            <td>{{ $detail->menu->nama_makanan }} x{{ $detail->qty }}</td>
+            <td class="right">Rp{{ number_format($originalPrice, 0, ',', '.') }}</td>
+        </tr>
+        @endforeach
+    </table>
+
+    <div class="divider"></div>
 
     <table>
         <tr>
             <td>Subtotal</td>
-            <td class="right">Rp{{ number_format($subtotal, 0, ',', '.') }}K</td>
+            <td class="right">Rp{{ number_format($subtotal, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td>Discount</td>
-            <td class="right">-Rp{{ number_format($totalDiskon, 0, ',', '.') }}K</td>
+            <td class="right">-Rp{{ number_format($totalDiskon, 0, ',', '.') }}</td>
         </tr>
         <tr class="total">
             <td>Total</td>
-            <td class="right">Rp{{ number_format($total, 0, ',', '.') }}K</td>
+            <td class="right">Rp{{ number_format($total, 0, ',', '.') }}</td>
         </tr>
     </table>
 
@@ -126,7 +114,7 @@
         </tr>
         <tr>
             <td>Paid</td>
-            <td class="right">Rp{{ number_format($total, 0, ',', '.') }}K</td>
+            <td class="right">Rp{{ number_format($total, 0, ',', '.') }}</td>
         </tr>
     </table>
     @php
