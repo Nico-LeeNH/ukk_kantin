@@ -20,4 +20,8 @@ class Transaksi extends Model
     {
         return $this->belongsTo(SiswaModel::class, 'id_siswa');
     }
+    public function Admin()
+    {
+        return $this->belongsTo(AdminS::class, 'id_stan');
+    }
 }

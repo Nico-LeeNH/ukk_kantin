@@ -8,6 +8,7 @@ use App\Models\Menu;
 use App\Models\MenuDiskon;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class DetailTransaksiController extends Controller
@@ -48,9 +49,12 @@ class DetailTransaksiController extends Controller
         $diskonPersentase = 0;
         if ($menuDiskon) {
             $diskon = $menuDiskon->diskon;
-            $tanggal_transaksi = $transaksi->tanggal;
-            if ($tanggal_transaksi >= $diskon->tanggal_awal && $tanggal_transaksi <= $diskon->tanggal_akhir) {
-                $diskonPersentase = $diskon->persentase_diskon;
+            $tanggal_transaksi = Carbon::parse($transaksi->tanggal);
+            $tanggal_awal = Carbon::parse($diskon->tanggal_awal);
+            $tanggal_akhir = Carbon::parse($diskon->tanggal_akhir);
+
+            if ($tanggal_transaksi->between($tanggal_awal, $tanggal_akhir)) {
+            $diskonPersentase = $diskon->persentase_diskon;
             }
         }
 

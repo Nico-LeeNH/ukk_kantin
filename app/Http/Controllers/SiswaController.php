@@ -9,6 +9,7 @@ use App\Models\siswa;
 use App\Models\SiswaModel;
 use App\Models\Transaksi;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -160,7 +161,6 @@ class SiswaController extends Controller
         ]);
     }
     public function cetakNotas($id_transaksi){
-        // $transaksi = Transaksi::with('details.siswa')->find($id_transaksi);
         $transaksi = Transaksi::with(['details.menu', 'siswa'])->find($id_transaksi);
         if (!$transaksi) {
             return response()->json([
@@ -168,7 +168,10 @@ class SiswaController extends Controller
                 'message' => 'Transaksi not found'
             ], 404);
         }
-    
+        $pdf = Pdf::loadView('nota', ['transaksi' => $transaksi]);
+
+        return $pdf->download('nota-transaksi-'.$transaksi->id.'.pdf');
+        
         $nota = [
             'transaksi' => $transaksi,
         ];
